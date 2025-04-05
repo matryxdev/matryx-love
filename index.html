@@ -7,7 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="https://em-content.zobj.net/thumbs/120/apple/325/red-heart_2764-fe0f.png">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -36,6 +37,12 @@
             --font-title: 'Lemon Milk', sans-serif;
             --font-body: 'Montserrat', sans-serif;
             --font-script: 'Dancing Script', cursive;
+            
+            /* Spicy mode colors */
+            --spicy-primary: #ff3d00;
+            --spicy-secondary: #ff9100;
+            --spicy-glow: rgba(255, 61, 0, 0.7);
+            --spicy-accent: #ffea00;
         }
 
         * {
@@ -45,8 +52,35 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(26, 12, 27, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            border: 2px solid rgba(26, 12, 27, 0.5);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
+        }
+        
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) rgba(26, 12, 27, 0.5);
+        }
+        
         body {
             overflow-x: hidden;
+            overflow-y: auto;
             background: radial-gradient(circle at center, #180728 0%, #0b0312 100%);
             color: var(--light-color);
             min-height: 100vh;
@@ -58,6 +92,10 @@
             font-family: var(--font-body);
             position: relative;
             touch-action: manipulation;
+        }
+        
+        body.spicy-mode {
+            background: radial-gradient(circle at center, #400808 0%, #1c0404 100%);
         }
         
         body::before {
@@ -75,6 +113,13 @@
             z-index: -1;
         }
         
+        body.spicy-mode::before {
+            background: 
+                radial-gradient(circle at 15% 40%, rgba(255, 61, 0, 0.15), transparent 20%),
+                radial-gradient(circle at 85% 20%, rgba(255, 145, 0, 0.15), transparent 25%),
+                radial-gradient(circle at 50% 70%, rgba(255, 234, 0, 0.15), transparent 30%);
+        }
+        
         #canvas-container {
             position: fixed;
             top: 0;
@@ -88,7 +133,7 @@
             font-family: var(--font-title);
             font-size: clamp(3rem, 10vw, 5.5rem);
             font-weight: 700;
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
             color: var(--light-color);
             text-shadow: var(--neon-glow);
             animation: textGlow 3s infinite alternate;
@@ -102,6 +147,13 @@
             text-transform: uppercase;
         }
         
+        body.spicy-mode .title {
+            background: linear-gradient(to right, var(--spicy-accent), var(--spicy-primary), var(--spicy-secondary));
+            -webkit-background-clip: text;
+            background-size: 200% auto;
+            text-shadow: 0 0 10px var(--spicy-glow), 0 0 20px var(--spicy-glow);
+        }
+        
         @keyframes gradientText {
             0% { background-position: 0% center; }
             50% { background-position: 100% center; }
@@ -111,6 +163,93 @@
         @keyframes textGlow {
             0% { text-shadow: 0 0 10px rgba(255, 51, 102, 0.5); }
             100% { text-shadow: 0 0 20px rgba(255, 51, 102, 0.8), 0 0 30px rgba(255, 51, 102, 0.6); }
+        }
+        
+        /* Spicy Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+        }
+        
+        .spicy-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .spicy-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
+            transition: var(--transition-normal);
+            border-radius: 34px;
+        }
+        
+        .switch-slider:before {
+            position: absolute;
+            content: "❤️";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 3px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            transition: var(--transition-normal);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size: 12px;
+        }
+        
+        input:checked + .switch-slider {
+            background: rgba(255, 61, 0, 0.2);
+            border-color: rgba(255, 145, 0, 0.3);
+        }
+        
+        input:checked + .switch-slider:before {
+            transform: translateX(30px);
+            content: "🔥";
+            background: linear-gradient(45deg, var(--spicy-primary), var(--spicy-secondary));
+        }
+        
+        .mode-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition-normal);
+        }
+        
+        .mode-label.romantic {
+            color: var(--primary-light);
+            opacity: 1;
+        }
+        
+        .mode-label.spicy {
+            color: var(--spicy-secondary);
+            opacity: 0.5;
+        }
+        
+        body.spicy-mode .mode-label.romantic {
+            opacity: 0.5;
+        }
+        
+        body.spicy-mode .mode-label.spicy {
+            opacity: 1;
         }
         
         .card {
@@ -131,6 +270,12 @@
             animation: fadeIn 2s ease-in-out;
             position: relative;
             overflow: hidden;
+        }
+        
+        body.spicy-mode .card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 145, 0, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255, 61, 0, 0.05);
         }
         
         .card::before, .card::after {
@@ -154,6 +299,19 @@
             opacity: 0.15;
         }
         
+        body.spicy-mode .card::before, body.spicy-mode .card::after {
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                transparent 0%,
+                var(--spicy-primary) 10%,
+                transparent 40%,
+                var(--spicy-secondary) 50%,
+                transparent 60%,
+                var(--spicy-accent) 80%,
+                transparent 100%
+            );
+        }
+        
         .card::before {
             top: -25%;
             left: -25%;
@@ -169,6 +327,60 @@
         @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        .name-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+        
+        .input-label {
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            font-weight: 500;
+            color: var(--light-color);
+            opacity: 0.9;
+        }
+        
+        .name-input {
+            width: 100%;
+            padding: min(0.9rem, 4vw) min(1.2rem, 4vw);
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-family: var(--font-body);
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            transition: var(--transition-normal);
+        }
+        
+        body.spicy-mode .name-input {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 145, 0, 0.2);
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 51, 102, 0.2);
+        }
+        
+        body.spicy-mode .name-input:focus {
+            border-color: var(--spicy-primary);
+            box-shadow: 0 0 0 2px rgba(255, 61, 0, 0.2);
+        }
+        
+        .name-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
         
         .phrase-button {
@@ -193,6 +405,15 @@
             gap: 10px;
             -webkit-appearance: none;
             -moz-appearance: none;
+            
+        }
+        .phrase-button {
+    /* Ajouter une marge en bas de chaque bouton */
+    margin-bottom: 30px;  /* Vous pouvez ajuster cette valeur selon vos préférences */
+}
+        body.spicy-mode .phrase-button {
+            background: linear-gradient(45deg, var(--spicy-primary) 0%, var(--spicy-secondary) 100%);
+            box-shadow: 0 5px 15px rgba(255, 61, 0, 0.4);
         }
         
         .phrase-button:hover, .phrase-button:focus {
@@ -200,8 +421,18 @@
             box-shadow: 0 15px 25px rgba(255, 51, 102, 0.6);
         }
         
+        body.spicy-mode .phrase-button:hover, body.spicy-mode .phrase-button:focus {
+            box-shadow: 0 15px 25px rgba(255, 61, 0, 0.5);
+        }
+        
         .phrase-button:active {
             transform: translateY(-2px);
+        }
+        
+        .phrase-button:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
         }
         
         .phrase-button::before {
@@ -215,7 +446,7 @@
             transition: 0.5s;
         }
         
-        .phrase-button:hover::before {
+        .phrase-button:not(:disabled):hover::before {
             left: 100%;
         }
         
@@ -261,6 +492,11 @@
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
         }
         
+        body.spicy-mode .btn-yes {
+            background: linear-gradient(45deg, #FF9800, #FFEB3B);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        
         .btn-no {
             background: linear-gradient(45deg, #FF5252, #FF8A80);
             color: white;
@@ -286,9 +522,18 @@
             transition: var(--transition-normal);
         }
         
+        body.spicy-mode .share-link {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 145, 0, 0.2);
+        }
+        
         .share-link:focus {
             outline: none;
             box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        
+        body.spicy-mode .share-link:focus {
+            box-shadow: 0 0 0 2px var(--spicy-primary);
         }
         
         .copy-btn {
@@ -308,6 +553,11 @@
             gap: 8px;
             -webkit-appearance: none;
             -moz-appearance: none;
+        }
+        
+        body.spicy-mode .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 145, 0, 0.2);
         }
         
         .copy-btn:hover, .copy-btn:focus {
@@ -361,6 +611,14 @@
             overflow: hidden;
         }
         
+        body.spicy-mode .result-card {
+            background: linear-gradient(135deg, rgba(255, 61, 0, 0.25) 0%, rgba(255, 145, 0, 0.25) 100%);
+            border-color: rgba(255, 234, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 
+                        inset 0 0 25px rgba(255, 255, 255, 0.08),
+                        0 0 15px rgba(255, 61, 0, 0.3);
+        }
+        
         /* Romantic background elements */
         .result-card::before {
             content: '';
@@ -374,6 +632,13 @@
                 radial-gradient(circle at 85% 25%, rgba(255, 107, 158, 0.3), transparent 30%),
                 radial-gradient(circle at 50% 85%, rgba(255, 157, 226, 0.3), transparent 35%);
             pointer-events: none;
+        }
+        
+        body.spicy-mode .result-card::before {
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(255, 61, 0, 0.3), transparent 30%),
+                radial-gradient(circle at 85% 25%, rgba(255, 145, 0, 0.3), transparent 30%),
+                radial-gradient(circle at 50% 85%, rgba(255, 234, 0, 0.3), transparent 35%);
         }
         
         /* Floating hearts decoration */
@@ -400,6 +665,22 @@
             opacity: 0.2;
             z-index: 0;
             animation: float-slow 5s ease-in-out infinite;
+        }
+        
+        body.spicy-mode .result-card-decoration.heart {
+            display: none;
+        }
+        
+        body.spicy-mode .result-card-decoration.fire {
+            display: block;
+        }
+        
+        .result-card-decoration.heart {
+            display: block;
+        }
+        
+        .result-card-decoration.fire {
+            display: none;
         }
         
         .decoration-1 {
@@ -461,6 +742,62 @@
             z-index: 1;
         }
         
+        body.spicy-mode .result-card-title {
+            background: linear-gradient(to right, var(--spicy-accent), var(--spicy-primary), var(--spicy-secondary));
+            text-shadow: 0 0 10px rgba(255, 61, 0, 0.7);
+        }
+        
+        /* Names display */
+        .names-heart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-script);
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: 700;
+            color: white;
+            margin: 0.8rem 0;
+            text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+        
+        body.spicy-mode .names-heart {
+            text-shadow: 0 0 10px rgba(255, 61, 0, 0.5);
+        }
+        
+        .name {
+            padding: 0 8px;
+        }
+        
+        .heart-icon {
+            display: inline-block;
+            color: var(--primary-light);
+            font-size: 1.2em;
+            margin: 0 5px;
+            animation: pulse-gentle 3s infinite;
+        }
+        
+        body.spicy-mode .heart-icon {
+            color: var(--spicy-secondary);
+        }
+        
+        body.spicy-mode .heart-icon.romantic {
+            display: none;
+        }
+        
+        body.spicy-mode .heart-icon.spicy {
+            display: inline-block;
+        }
+        
+        .heart-icon.romantic {
+            display: inline-block;
+        }
+        
+        .heart-icon.spicy {
+            display: none;
+        }
+        
         /* Romantic divider */
         .romantic-divider {
             width: 80%;
@@ -485,6 +822,27 @@
             margin: 0 10px;
             color: var(--primary-light);
             filter: drop-shadow(0 0 5px rgba(255, 51, 102, 0.5));
+        }
+        
+        body.spicy-mode .romantic-divider-heart {
+            color: var(--spicy-secondary);
+            filter: drop-shadow(0 0 5px rgba(255, 61, 0, 0.5));
+        }
+        
+        body.spicy-mode .romantic-divider-heart.romantic {
+            display: none;
+        }
+        
+        body.spicy-mode .romantic-divider-heart.spicy {
+            display: inline-block;
+        }
+        
+        .romantic-divider-heart.romantic {
+            display: inline-block;
+        }
+        
+        .romantic-divider-heart.spicy {
+            display: none;
         }
         
         .result-card-message {
@@ -514,6 +872,10 @@
             font-weight: 700;
         }
         
+        body.spicy-mode .romantic-question {
+            text-shadow: 0 0 10px rgba(255, 61, 0, 0.6);
+        }
+        
         /* Response highlight */
         .romantic-response {
             font-size: clamp(1.2rem, 5vw, 2rem);
@@ -535,6 +897,11 @@
             border-color: rgba(76, 175, 80, 0.4);
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             animation: pulse-gentle 3s infinite;
+        }
+        
+        body.spicy-mode .positive-response {
+            background: linear-gradient(45deg, rgba(255, 152, 0, 0.3), rgba(255, 235, 59, 0.3));
+            border-color: rgba(255, 152, 0, 0.4);
         }
         
         .negative-response {
@@ -559,6 +926,10 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             z-index: 1;
+        }
+        
+        body.spicy-mode .result-card-logo {
+            text-shadow: 0 0 5px rgba(255, 61, 0, 0.5);
         }
         
         .action-btn {
@@ -602,9 +973,18 @@
             box-shadow: var(--button-glow);
         }
         
+        body.spicy-mode .download-btn {
+            background: linear-gradient(45deg, var(--spicy-primary), var(--spicy-secondary));
+            box-shadow: 0 5px 15px rgba(255, 61, 0, 0.4);
+        }
+        
         .download-btn:hover, .download-btn:focus {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(255, 51, 102, 0.6);
+        }
+        
+        body.spicy-mode .download-btn:hover, body.spicy-mode .download-btn:focus {
+            box-shadow: 0 10px 25px rgba(255, 61, 0, 0.5);
         }
         
         .new-link-btn {
@@ -630,6 +1010,24 @@
             text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
         }
         
+        .validation-message {
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition-normal);
+        }
+        
+        body.spicy-mode .validation-message {
+            color: var(--spicy-secondary);
+        }
+        
+        .validation-message.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        
         .hearts-container {
             position: fixed;
             top: 0;
@@ -646,6 +1044,10 @@
             animation: float 4s ease-in-out infinite;
             opacity: 0;
             filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.5));
+        }
+        
+        body.spicy-mode .heart {
+            filter: drop-shadow(0 0 10px rgba(255, 61, 0, 0.5));
         }
 
         /* 3D heart floating animation */
@@ -756,6 +1158,10 @@
             animation: glowPulse 4s infinite alternate;
         }
         
+        body.spicy-mode .glow-effect::after {
+            background: radial-gradient(circle at center, var(--spicy-primary) 0%, transparent 70%);
+        }
+        
         @keyframes glowPulse {
             0% { opacity: 0.1; }
             100% { opacity: 0.3; }
@@ -787,6 +1193,11 @@
             text-shadow: 0 0 8px rgba(255, 51, 102, 0.5);
         }
         
+        body.spicy-mode .footer a:hover, body.spicy-mode .footer a:focus {
+            color: var(--spicy-secondary);
+            text-shadow: 0 0 8px rgba(255, 61, 0, 0.5);
+        }
+        
         .footer a::after {
             content: '';
             position: absolute;
@@ -798,6 +1209,10 @@
             transform: scaleX(0);
             transform-origin: center;
             transition: transform 0.3s ease;
+        }
+        
+        body.spicy-mode .footer a::after {
+            background: linear-gradient(90deg, transparent, var(--spicy-primary), transparent);
         }
         
         .footer a:hover::after, .footer a:focus::after {
@@ -881,6 +1296,10 @@
                 padding-top: min(1.2rem, 3vw);
                 padding-bottom: min(1.2rem, 3vw);
             }
+            
+            .name-input {
+                min-height: 44px;
+            }
         }
         
         /* Reduce motion for users who prefer it */
@@ -906,15 +1325,52 @@
     <div id="creator-view" class="card glow-effect">
         <p class="instructions">Choose a romantic phrase, create a link, and share it with your crush. When they respond, you'll both see a beautiful shareable result!</p>
         
-        <button class="phrase-button" data-phrase="love">
-            <span class="love-icon">❤️</span> Do you love me?
-        </button>
-        <button class="phrase-button" data-phrase="date">
-            <span class="love-icon">💘</span> Would you date me?
-        </button>
-        <button class="phrase-button" data-phrase="hangout">
-            <span class="love-icon">💖</span> Do you wanna hang out with me?
-        </button>
+        <div class="mode-toggle">
+            <span class="mode-label romantic">Romantic</span>
+            <label class="spicy-switch">
+                <input type="checkbox" id="mode-toggle">
+                <span class="switch-slider"></span>
+            </label>
+            <span class="mode-label spicy">Spicy 🔥</span>
+        </div>
+        
+        <div class="name-inputs">
+            <div class="input-group">
+                <label class="input-label" for="sender-name">Your name</label>
+                <input type="text" id="sender-name" class="name-input" placeholder="Enter your name" maxlength="30">
+            </div>
+            <div class="input-group">
+                <label class="input-label" for="crush-name">Your crush's name</label>
+                <input type="text" id="crush-name" class="name-input" placeholder="Enter their name" maxlength="30">
+            </div>
+        </div>
+        <p id="validation-message" class="validation-message">Please enter both names to continue</p>
+        
+        <!-- Regular Romantic Phrases -->
+        <div id="romantic-phrases">
+            <button class="phrase-button" data-phrase="love" disabled>
+                <span class="love-icon">❤️</span> Do you love me?
+            </button>
+            <button class="phrase-button" data-phrase="date" disabled>
+                <span class="love-icon">💘</span> Would you date me?
+            </button>
+            <button class="phrase-button" data-phrase="hangout" disabled>
+                <span class="love-icon">💖</span> Do you wanna hang out with me?
+            </button>
+        </div>
+        
+        <!-- Spicy Phrases -->
+        <div id="spicy-phrases" class="hidden">
+            <button class="phrase-button" data-phrase="sex" disabled>
+                <span class="love-icon">🔥</span> Would you have sex with me?
+            </button>
+            <button class="phrase-button" data-phrase="kiss" disabled>
+                <span class="love-icon">💋</span> Would you make out with me?
+            </button>
+            <button class="phrase-button" data-phrase="hot" disabled>
+                <span class="love-icon">🥵</span> Do you think I'm hot?
+            </button>
+        </div>
         
         <input type="text" class="share-link hidden" readonly>
         <button class="copy-btn hidden">
@@ -944,18 +1400,34 @@
         <div class="result-container">
             <h2 class="result-message" id="result-message"></h2>
             <div id="result-card" class="result-card">
-                <!-- Decorative elements -->
-                <span class="result-card-decoration decoration-1">❤️</span>
-                <span class="result-card-decoration decoration-2">💖</span>
-                <span class="result-card-decoration decoration-3">💘</span>
-                <span class="result-card-decoration decoration-4">💕</span>
-                <span class="result-card-decoration decoration-5">💗</span>
-                <span class="result-card-decoration decoration-6">💓</span>
+                <!-- Decorative elements - hearts -->
+                <span class="result-card-decoration heart decoration-1">❤️</span>
+                <span class="result-card-decoration heart decoration-2">💖</span>
+                <span class="result-card-decoration heart decoration-3">💘</span>
+                <span class="result-card-decoration heart decoration-4">💕</span>
+                <span class="result-card-decoration heart decoration-5">💗</span>
+                <span class="result-card-decoration heart decoration-6">💓</span>
+                
+                <!-- Decorative elements - fire -->
+                <span class="result-card-decoration fire decoration-1">🔥</span>
+                <span class="result-card-decoration fire decoration-2">💥</span>
+                <span class="result-card-decoration fire decoration-3">🔥</span>
+                <span class="result-card-decoration fire decoration-4">💋</span>
+                <span class="result-card-decoration fire decoration-5">🔥</span>
+                <span class="result-card-decoration fire decoration-6">🥵</span>
                 
                 <h3 class="result-card-title">MATRYX LOVE</h3>
                 
+                <div class="names-heart">
+                    <span class="name sender-name-display"></span>
+                    <span class="heart-icon romantic">❤️</span>
+                    <span class="heart-icon spicy">🔥</span>
+                    <span class="name crush-name-display"></span>
+                </div>
+                
                 <div class="romantic-divider">
-                    <span class="romantic-divider-heart">❤️</span>
+                    <span class="romantic-divider-heart romantic">❤️</span>
+                    <span class="romantic-divider-heart spicy">🔥</span>
                 </div>
                 
                 <div class="result-card-message" id="result-card-message"></div>
@@ -994,8 +1466,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const phraseParam = urlParams.get('phrase');
         const responseParam = urlParams.get('response');
+        const senderParam = urlParams.get('sender');
+        const crushParam = urlParams.get('crush');
+        const modeParam = urlParams.get('mode'); // 'romantic' or 'spicy'
         
         // Elements
+        const body = document.body;
         const creatorView = document.getElementById('creator-view');
         const responderView = document.getElementById('responder-view');
         const resultView = document.getElementById('result-view');
@@ -1008,6 +1484,35 @@
         const newLinkBtn = document.querySelector('.new-link-btn');
         const heartsContainer = document.getElementById('hearts-container');
         const resultCard = document.getElementById('result-card');
+        const senderNameInput = document.getElementById('sender-name');
+        const crushNameInput = document.getElementById('crush-name');
+        const validationMessage = document.getElementById('validation-message');
+        const romanticPhrases = document.getElementById('romantic-phrases');
+        const spicyPhrases = document.getElementById('spicy-phrases');
+        const modeToggle = document.getElementById('mode-toggle');
+        const senderNameDisplay = document.querySelector('.sender-name-display');
+        const crushNameDisplay = document.querySelector('.crush-name-display');
+        
+        // Check if we need to activate spicy mode from URL param
+        if (modeParam === 'spicy') {
+            body.classList.add('spicy-mode');
+        }
+        
+        // Mode toggle functionality
+        modeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('spicy-mode');
+                romanticPhrases.classList.add('hidden');
+                spicyPhrases.classList.remove('hidden');
+            } else {
+                body.classList.remove('spicy-mode');
+                romanticPhrases.classList.remove('hidden');
+                spicyPhrases.classList.add('hidden');
+            }
+            
+            // Check validation again because we're toggling between different button sets
+            validateNames();
+        });
         
         // Detect mobile for performance optimization
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -1140,13 +1645,22 @@
             particlesMesh.rotation.x += 0.0002 * rotationSpeed;
             
             // Animate each heart
-            hearts.forEach(heart => {
+            hearts.forEach((heart, index) => {
                 heart.rotation.x += heart.userData.rotationSpeed.x * rotationSpeed;
                 heart.rotation.y += heart.userData.rotationSpeed.y * rotationSpeed;
                 heart.rotation.z += heart.userData.rotationSpeed.z * rotationSpeed;
                 
                 // Add floating motion
                 heart.position.y = heart.position.y + Math.sin(Date.now() * 0.001) * 0.002 * rotationSpeed;
+                
+                // Update colors based on mode
+                if (body.classList.contains('spicy-mode')) {
+                    const spicyColors = [0xff3d00, 0xff9100, 0xffea00, 0xff5722];
+                    heart.material.color.setHex(spicyColors[index % spicyColors.length]);
+                } else {
+                    const romanticColors = [0xff3366, 0xff6b9e, 0xff9de2, 0xff5252];
+                    heart.material.color.setHex(romanticColors[index % romanticColors.length]);
+                }
             });
             
             renderer.render(scene, camera);
@@ -1170,31 +1684,101 @@
             }, 250);
         });
         
-        // Phrase data
-        const phrases = {
+        // Regular phrases
+        const romanticPhraseData = {
             love: "Do you love me?",
             date: "Would you date me?",
             hangout: "Do you wanna hang out with me?"
         };
         
-        // Response messages
-        const responseMessages = {
-            love: {
-                yes: "They said YES! ❤️ They love you!",
-                no: "They said no. 💔 Don't give up on love."
-            },
-            date: {
-                yes: "They want to date you! ❤️ When's the first date?",
-                no: "They don't want to date right now. 💔 That's okay."
-            },
-            hangout: {
-                yes: "They want to hang out with you! ❤️ Make plans soon!",
-                no: "They can't hang out right now. 💔 Maybe another time."
-            }
+        // Spicy phrases
+        const spicyPhraseData = {
+            sex: "Would you have sex with me?",
+            kiss: "Would you make out with me?",
+            hot: "Do you think I'm hot?"
         };
         
-        // Function to create floating hearts - fewer on mobile
-        function createHearts(isPositive = true) {
+        // Combined phrases
+        const phrases = {
+            ...romanticPhraseData,
+            ...spicyPhraseData
+        };
+        
+        // Check which mode is active
+        function isSpicyMode() {
+            return body.classList.contains('spicy-mode');
+        }
+        
+        // Name validation
+        function validateNames() {
+            const senderName = senderNameInput.value.trim();
+            const crushName = crushNameInput.value.trim();
+            const allPhraseButtons = document.querySelectorAll('.phrase-button');
+            
+            if (senderName && crushName) {
+                allPhraseButtons.forEach(btn => {
+                    btn.disabled = false;
+                });
+                validationMessage.classList.remove('show');
+                return true;
+            } else {
+                allPhraseButtons.forEach(btn => {
+                    btn.disabled = true;
+                });
+                validationMessage.classList.add('show');
+                return false;
+            }
+        }
+        
+        // Input event listeners
+        senderNameInput.addEventListener('input', validateNames);
+        crushNameInput.addEventListener('input', validateNames);
+        
+        // Personalized response messages
+        function getResponseMessage(phrase, response, senderName, crushName) {
+            // Regular romantic messages
+            const romanticMessages = {
+                love: {
+                    yes: `${crushName} said YES! ❤️ They love ${senderName}!`,
+                    no: `${crushName} said no. 💔 Don't give up on love, ${senderName}.`
+                },
+                date: {
+                    yes: `${crushName} wants to date ${senderName}! ❤️ When's the first date?`,
+                    no: `${crushName} doesn't want to date right now. 💔 That's okay, ${senderName}.`
+                },
+                hangout: {
+                    yes: `${crushName} wants to hang out with ${senderName}! ❤️ Make plans soon!`,
+                    no: `${crushName} can't hang out right now. 💔 Maybe another time, ${senderName}.`
+                }
+            };
+            
+            // Spicy messages
+            const spicyMessages = {
+                sex: {
+                    yes: `${crushName} said YES! 🔥 They want to get intimate with ${senderName}!`,
+                    no: `${crushName} said no. 💔 Better luck next time, ${senderName}.`
+                },
+                kiss: {
+                    yes: `${crushName} wants to make out with ${senderName}! 💋 Things are heating up!`,
+                    no: `${crushName} doesn't want to make out right now. 💔 Maybe try again later, ${senderName}.`
+                },
+                hot: {
+                    yes: `${crushName} thinks ${senderName} is HOT! 🥵 The attraction is real!`,
+                    no: `${crushName} doesn't find ${senderName} hot. 💔 Beauty is subjective anyway.`
+                }
+            };
+            
+            // Combined messages
+            const messages = {
+                ...romanticMessages,
+                ...spicyMessages
+            };
+            
+            return messages[phrase][response];
+        }
+        
+        // Function to create floating hearts or fire
+        function createHearts(isPositive = true, isSpicy = false) {
             // Clear existing hearts
             heartsContainer.innerHTML = '';
             
@@ -1206,10 +1790,14 @@
                     const heart = document.createElement('div');
                     heart.classList.add('heart');
                     
-                    // More variety in heart emojis
-                    const heartTypes = isPositive ? 
-                        ['❤️', '💕', '💖', '💗', '💓', '💘'] : 
-                        ['💔', '💭', '🖤', '💨', '😢'];
+                    // More variety in heart emojis - based on mode
+                    const heartTypes = isSpicy ?
+                        (isPositive ? 
+                            ['🔥', '💥', '💋', '🥵', '😏', '✨'] : 
+                            ['💔', '🙄', '😒', '👎', '❌', '😬']) :
+                        (isPositive ? 
+                            ['❤️', '💕', '💖', '💗', '💓', '💘'] : 
+                            ['💔', '💭', '🖤', '💨', '😢', '😔']);
                     
                     heart.innerHTML = heartTypes[Math.floor(Math.random() * heartTypes.length)];
                     heart.style.fontSize = `${Math.random() * 25 + 15}px`;
@@ -1255,7 +1843,7 @@
         }
         
         // Function to pulse all 3D hearts
-        function pulseAllHearts(scale = 0.02, isPositive = true) {
+        function pulseAllHearts(scale = 0.02, isPositive = true, isSpicy = false) {
             hearts.forEach((heart, index) => {
                 const originalScales = isMobile ? 
                     [0.015, 0.010] : 
@@ -1264,16 +1852,31 @@
                 const originalScale = originalScales[index];
                 const targetScale = originalScale * (1 + scale);
                 
-                // Change color based on response
-                const positiveColors = isMobile ? 
+                // Change color based on response and mode
+                const positiveRomanticColors = isMobile ? 
                     [0xff3366, 0xff6b9e] : 
                     [0xff3366, 0xff6b9e, 0xff9de2, 0xff5252];
                 
-                const negativeColors = isMobile ? 
+                const negativeRomanticColors = isMobile ? 
                     [0x666666, 0x555555] : 
                     [0x666666, 0x555555, 0x777777, 0x444444];
                 
-                const newColor = isPositive ? positiveColors[index] : negativeColors[index];
+                const positiveSpicyColors = isMobile ? 
+                    [0xff3d00, 0xff9100] : 
+                    [0xff3d00, 0xff9100, 0xffea00, 0xff5722];
+                
+                const negativeSpicyColors = isMobile ? 
+                    [0x666666, 0x555555] : 
+                    [0x666666, 0x555555, 0x777777, 0x444444];
+                
+                let newColors;
+                if (isSpicy) {
+                    newColors = isPositive ? positiveSpicyColors : negativeSpicyColors;
+                } else {
+                    newColors = isPositive ? positiveRomanticColors : negativeRomanticColors;
+                }
+                
+                const newColor = newColors[index];
                 
                 heart.material.color.setHex(newColor);
                 
@@ -1326,7 +1929,7 @@
                                     // Reset color if positive
                                     if (isPositive) {
                                         setTimeout(() => {
-                                            heart.material.color.setHex(positiveColors[index]);
+                                            heart.material.color.setHex(newColors[index]);
                                         }, 300);
                                     }
                                 }
@@ -1384,36 +1987,68 @@
             }
         }
         
+        // Encode names for URL
+        function encodeNames(name) {
+            return encodeURIComponent(name.trim());
+        }
+        
         // Check the URL parameters to determine the view
-        if (phraseParam && phrases[phraseParam] && !responseParam) {
+        if (phraseParam && phrases[phraseParam] && !responseParam && senderParam && crushParam) {
             // Responder view
             creatorView.classList.add('hidden');
             responderView.classList.remove('hidden');
             
-            // Set the question message
-            responderMessage.innerHTML = `Someone is asking: <span style="font-size: 1.4em; display: block; margin: 15px 0; font-weight: 600;">"${phrases[phraseParam]}"</span>`;
+            // Check if we're in spicy mode from URL
+            const currentMode = modeParam === 'spicy' ? 'spicy' : 'romantic';
+            if (currentMode === 'spicy') {
+                body.classList.add('spicy-mode');
+            }
+            
+            // Check if this is a spicy phrase
+            const isSpicyPhrase = Object.keys(spicyPhraseData).includes(phraseParam);
+            
+            // If it's a spicy phrase but we're not in spicy mode, activate spicy mode
+            if (isSpicyPhrase && currentMode !== 'spicy') {
+                body.classList.add('spicy-mode');
+            }
+            
+            // Decode names
+            const senderName = decodeURIComponent(senderParam);
+            const crushName = decodeURIComponent(crushParam);
+            
+            // Set the question message with sender's name
+            responderMessage.innerHTML = `${senderName} is asking you: <span style="font-size: 1.4em; display: block; margin: 15px 0; font-weight: 600;">"${phrases[phraseParam]}"</span>`;
+            
+            // Personalize the yes/no buttons
+            const yesIcon = isSpicyMode() ? '🔥' : '❤️';
+            const noIcon = '💔';
+            
+            document.querySelector('.btn-yes').innerHTML = `<span class="love-icon">${yesIcon}</span> Yes, ${senderName}`;
+            document.querySelector('.btn-no').innerHTML = `<span class="love-icon">${noIcon}</span> No, ${senderName}`;
             
             // Handle response buttons
             document.querySelector('.btn-yes').addEventListener('click', () => {
                 // Animate hearts before redirecting
-                createHearts(true);
-                pulseAllHearts(1.5, true);
+                createHearts(true, isSpicyMode());
+                pulseAllHearts(1.5, true, isSpicyMode());
                 
                 setTimeout(() => {
-                    window.location.href = `${window.location.origin}${window.location.pathname}?phrase=${phraseParam}&response=yes`;
+                    const modeParam = isSpicyMode() ? 'spicy' : 'romantic';
+                    window.location.href = `${window.location.origin}${window.location.pathname}?phrase=${phraseParam}&response=yes&sender=${senderParam}&crush=${crushParam}&mode=${modeParam}`;
                 }, 800);
             });
             
             document.querySelector('.btn-no').addEventListener('click', () => {
                 // Animate hearts before redirecting
-                createHearts(false);
-                pulseAllHearts(1.5, false);
+                createHearts(false, isSpicyMode());
+                pulseAllHearts(1.5, false, isSpicyMode());
                 
                 setTimeout(() => {
-                    window.location.href = `${window.location.origin}${window.location.pathname}?phrase=${phraseParam}&response=no`;
+                    const modeParam = isSpicyMode() ? 'spicy' : 'romantic';
+                    window.location.href = `${window.location.origin}${window.location.pathname}?phrase=${phraseParam}&response=no&sender=${senderParam}&crush=${crushParam}&mode=${modeParam}`;
                 }, 800);
             });
-        } else if (phraseParam && responseParam && phrases[phraseParam]) {
+        } else if (phraseParam && responseParam && phrases[phraseParam] && senderParam && crushParam) {
             // Result view
             creatorView.classList.add('hidden');
             responderView.classList.add('hidden');
@@ -1421,8 +2056,30 @@
             
             const isPositive = responseParam === 'yes';
             
-            // Set result message
-            resultMessage.textContent = responseMessages[phraseParam][responseParam];
+            // Check if we're in spicy mode from URL
+            const currentMode = modeParam === 'spicy' ? 'spicy' : 'romantic';
+            if (currentMode === 'spicy') {
+                body.classList.add('spicy-mode');
+            }
+            
+            // Check if this is a spicy phrase
+            const isSpicyPhrase = Object.keys(spicyPhraseData).includes(phraseParam);
+            
+            // If it's a spicy phrase but we're not in spicy mode, activate spicy mode
+            if (isSpicyPhrase && currentMode !== 'spicy') {
+                body.classList.add('spicy-mode');
+            }
+            
+            // Decode names
+            const senderName = decodeURIComponent(senderParam);
+            const crushName = decodeURIComponent(crushParam);
+            
+            // Set names in the display
+            senderNameDisplay.textContent = senderName;
+            crushNameDisplay.textContent = crushName;
+            
+            // Set personalized result message
+            resultMessage.textContent = getResponseMessage(phraseParam, responseParam, senderName, crushName);
             
             // Enhanced result card message with more romantic styling
             resultCardMessage.innerHTML = `
@@ -1430,20 +2087,29 @@
                 <div class="romantic-question">"${phrases[phraseParam]}"</div>
                 <div>Response:</div>
                 <div class="romantic-response ${isPositive ? 'positive-response' : 'negative-response'}">
-                    ${isPositive ? 'YES! ❤️' : 'No 💔'}
+                    ${isPositive ? `YES! ${isSpicyMode() ? '🔥' : '❤️'}` : 'No 💔'}
                 </div>
             `;
             
             // Create hearts and animations
-            createHearts(isPositive);
-            pulseAllHearts(1.5, isPositive);
+            createHearts(isPositive, isSpicyMode());
+            pulseAllHearts(1.5, isPositive, isSpicyMode());
             
             // Update background effect based on response
             if (isPositive) {
-                document.body.style.background = "radial-gradient(circle at center, #180728 0%, #0b0312 100%)";
+                if (isSpicyMode()) {
+                    document.body.style.background = "radial-gradient(circle at center, #400808 0%, #1c0404 100%)";
+                } else {
+                    document.body.style.background = "radial-gradient(circle at center, #180728 0%, #0b0312 100%)";
+                }
             } else {
-                document.body.style.background = "radial-gradient(circle at center, #0b1221 0%, #080a13 100%)";
-                resultCard.style.background = "linear-gradient(135deg, rgba(100, 100, 100, 0.25) 0%, rgba(80, 80, 80, 0.25) 100%)";
+                if (isSpicyMode()) {
+                    document.body.style.background = "radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%)";
+                    resultCard.style.background = "linear-gradient(135deg, rgba(100, 100, 100, 0.25) 0%, rgba(80, 80, 80, 0.25) 100%)";
+                } else {
+                    document.body.style.background = "radial-gradient(circle at center, #0b1221 0%, #080a13 100%)";
+                    resultCard.style.background = "linear-gradient(135deg, rgba(100, 100, 100, 0.25) 0%, rgba(80, 80, 80, 0.25) 100%)";
+                }
             }
             
             // Generate shareable image
@@ -1455,13 +2121,22 @@
             });
         } else {
             // Creator view (default)
-            // Handle phrase buttons
-            const phraseButtons = document.querySelectorAll('.phrase-button');
+            // Get all phrase buttons
+            const allPhraseButtons = document.querySelectorAll('.phrase-button');
             
-            phraseButtons.forEach(button => {
+            // Handle phrase buttons
+            allPhraseButtons.forEach(button => {
                 button.addEventListener('click', () => {
+                    if (!validateNames()) {
+                        return;
+                    }
+                    
                     const phrase = button.getAttribute('data-phrase');
-                    const link = `${window.location.origin}${window.location.pathname}?phrase=${phrase}`;
+                    const senderName = encodeNames(senderNameInput.value);
+                    const crushName = encodeNames(crushNameInput.value);
+                    const mode = isSpicyMode() ? 'spicy' : 'romantic';
+                    
+                    const link = `${window.location.origin}${window.location.pathname}?phrase=${phrase}&sender=${senderName}&crush=${crushName}&mode=${mode}`;
                     
                     // Show share link and copy button
                     shareLink.value = link;
@@ -1469,21 +2144,28 @@
                     copyBtn.classList.remove('hidden');
                     
                     // Pulse the hearts
-                    pulseAllHearts(1.5, true);
+                    pulseAllHearts(1.5, true, isSpicyMode());
                     
                     // Create floating hearts
-                    createHearts(true);
+                    createHearts(true, isSpicyMode());
                     
                     // Highlight selected button
-                    phraseButtons.forEach(btn => {
+                    const currentPhraseSet = isSpicyMode() ? 
+                        document.querySelectorAll('#spicy-phrases .phrase-button') : 
+                        document.querySelectorAll('#romantic-phrases .phrase-button');
+                    
+                    currentPhraseSet.forEach(btn => {
                         btn.style.opacity = '0.7';
                         btn.style.transform = 'translateY(0)';
                     });
                     button.style.opacity = '1';
                     button.style.transform = 'translateY(-5px)';
                     
+                    // Set icon based on mode
+                    const icon = isSpicyMode() ? '🔥' : '❤️';
+                    
                     // Create pulsing glow behind the button
-                    button.innerHTML = `<span class="love-icon" style="font-size: 1.3em;">❤️</span> ${phrases[phrase]}`;
+                    button.innerHTML = `<span class="love-icon" style="font-size: 1.3em;">${icon}</span> ${phrases[phrase]}`;
                 });
             });
             
